@@ -5,8 +5,8 @@ use crate::components::*;
 const WALL_COLOR: Color = Color::rgb(0.2, 0.2, 0.2);
 
 // Vertical and Horizontal Wall Sizes
-const VSIDE_WALL_SIZE: Vec2 = Vec2 { x: 20.0, y: 750.0 };
-const HSIDE_WALL_SIZE: Vec2 = Vec2 { x: 1320.0, y: 20.0 };
+const VSIDE_WALL_SIZE: Vec3 = Vec3 { x: 20.0, y: 750.0, z:0.0 };
+const HSIDE_WALL_SIZE: Vec3 = Vec3 { x: 1320.0, y: 20.0, z: 0.0 };
 
 // Wall Transforms
 const RIGHT_WALL_POS: Vec3 = Vec3 { x: 650.0, y: 0.0, z: 0.0 };
@@ -31,10 +31,9 @@ fn spawn(mut commands: Commands) {
     commands.spawn((SpriteBundle{
         sprite: Sprite {
             color: WALL_COLOR,
-            custom_size: Some(VSIDE_WALL_SIZE),
             ..default()
         },
-        transform: Transform::from_translation(RIGHT_WALL_POS),
+        transform: Transform::from_translation(RIGHT_WALL_POS).with_scale(VSIDE_WALL_SIZE),
         ..default()
     }, 
     Wall { id: 0 }));
@@ -43,10 +42,9 @@ fn spawn(mut commands: Commands) {
     commands.spawn((SpriteBundle{
         sprite: Sprite {
             color: WALL_COLOR,
-            custom_size: Some(VSIDE_WALL_SIZE),
             ..default()
         },
-        transform: Transform::from_translation(LEFT_WALL_POS),
+        transform: Transform::from_translation(LEFT_WALL_POS).with_scale(VSIDE_WALL_SIZE),
         ..default()
     },
     Wall { id: 1 }));
@@ -55,10 +53,9 @@ fn spawn(mut commands: Commands) {
     commands.spawn((SpriteBundle{
         sprite: Sprite {
             color: WALL_COLOR,
-            custom_size: Some(HSIDE_WALL_SIZE),
             ..default()
         },
-        transform: Transform::from_translation(TOP_WALL_POS),
+        transform: Transform::from_translation(TOP_WALL_POS).with_scale(HSIDE_WALL_SIZE),
         ..default()
     },
     Wall { id: 2 }));
@@ -67,10 +64,9 @@ fn spawn(mut commands: Commands) {
     commands.spawn((SpriteBundle{
         sprite: Sprite {
             color: WALL_COLOR,
-            custom_size: Some(HSIDE_WALL_SIZE),
             ..default()
         },
-        transform: Transform::from_translation(BOTTOM_WALL_POS),
+        transform: Transform::from_translation(BOTTOM_WALL_POS).with_scale(HSIDE_WALL_SIZE),
         ..default()
     },
     Wall { id: 3 }));
@@ -78,11 +74,11 @@ fn spawn(mut commands: Commands) {
 }
 
 // Checks if entities collide
-fn entity_collision(mut _commands: Commands, time: Res<Time>, mut paddles: Query<(&mut Transform, &Sprite, &Paddle), (With<Paddle>, Without<Wall>)>, mut walls: Query<(&Transform, &Sprite, &Wall), With<Wall>>) {
+fn entity_collision(mut _commands: Commands, time: Res<Time>, mut paddles: Query<(&mut Transform, &Paddle), (With<Paddle>, Without<Wall>)>, mut walls: Query<(&Transform, &Wall), With<Wall>>) {
     // Iterates through all of the paddles to see if they collide with Walls and if they do it stops their movement
-    for (mut paddle_transform, paddle_sprite, paddle) in &mut paddles {
-        for (wall_transform, wall_sprite, wall) in &mut walls {
-            let hit = collide(paddle_transform.translation, paddle_sprite.custom_size.unwrap(), wall_transform.translation, wall_sprite.custom_size.unwrap());
+    for (mut paddle_transform, paddle) in &mut paddles {
+        for (wall_transform, wall) in &mut walls {
+            let hit = collide(paddle_transform.translation, paddle_transform.scale.truncate(), wall_transform.translation, wall_transform.scale.truncate());
 
             if let Some(_collided) = hit {
                 if wall.id == 2 {

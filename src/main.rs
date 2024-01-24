@@ -1,9 +1,11 @@
 mod player;
 mod components;
 mod world;
+mod ball;
 
 use bevy::prelude::*;
 use player::*;
+use ball::*;
 use world::*;
 
 fn main() {
@@ -11,6 +13,7 @@ fn main() {
     .add_systems(Startup, startup)
     .add_plugins(DefaultPlugins)
     .add_plugins(PlayerPlugin)
+    .add_plugins(BallPlugin)
     .add_plugins(WorldPlugin)
     .run();
 }
