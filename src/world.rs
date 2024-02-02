@@ -74,13 +74,17 @@ fn spawn(mut commands: Commands) {
 }
 
 // Checks if entities collide
-fn entity_collision(mut _commands: Commands, time: Res<Time>, mut paddles: Query<(&mut Transform, &Paddle), (With<Paddle>, Without<Wall>)>, mut walls: Query<(&Transform, &Wall), With<Wall>>) {
-    // Iterates through all of the paddles to see if they collide with Walls and if they do it stops their movement
-    for (mut paddle_transform, paddle) in &mut paddles {
-        for (wall_transform, wall) in &mut walls {
-            let hit = collide(paddle_transform.translation, paddle_transform.scale.truncate(), wall_transform.translation, wall_transform.scale.truncate());
+fn entity_collision(mut _commands: Commands, time: Res<Time>, mut paddles: Query<(&mut Transform, &Paddle), (With<Paddle>, Without<Wall>)>, mut walls: Query<(&Transform, &Wall), With<Wall>>, mut ball: Query<(&Transform, &mut Ball), (With<Ball>, Without<Wall>, Without<Paddle>)>) {
+    //Ball Query
+    let (ball_transform, mut ball) = ball.single_mut();
 
-            if let Some(_collided) = hit {
+    // Iterates through walls to check for collision
+    for (wall_transform, wall) in &mut walls {
+
+        // Checks for Paddle & Wall Collision and stops the paddles from moving past the wall
+        for (mut paddle_transform, paddle) in &mut paddles {
+
+            if let Some(_collided) = collide(paddle_transform.translation, paddle_transform.scale.truncate(), wall_transform.translation, wall_transform.scale.truncate()) {
                 if wall.id == 2 {
                     paddle_transform.translation.y = paddle_transform.translation.y - paddle.speed * time.delta_seconds();
                 } else if wall.id == 3 {
@@ -88,5 +92,22 @@ fn entity_collision(mut _commands: Commands, time: Res<Time>, mut paddles: Query
                 }
             }
         }
+
+        // Checks for Ball & Wall Collision and negates the ball speed to change direction 
+        if let Some(_collide) = collide(ball_transform.translation, ball_transform.scale.truncate(), wall_transform.translation, wall_transform.scale.truncate()) {
+            if wall.id == 0 || wall.id == 1 {
+                ball.speed_x = -ball.speed_x;
+            } else {
+                ball.speed_y = -ball.speed_y;
+            }
+        }
     }
+
+    // Checks for Paddle & Ball Collision and negates the ball speed to change direction 
+    for (paddle_transform, _paddle) in &mut paddles {
+        if let Some(_collide) = collide(paddle_transform.translation, paddle_transform.scale.truncate(), ball_transform.translation, ball_transform.scale.truncate()) {
+            ball.speed_x = -ball.speed_x;
+        }
+    }
+
 }

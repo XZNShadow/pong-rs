@@ -8,7 +8,10 @@ pub struct Paddle {
 }
 
 #[derive(Component)]
-pub struct Ball;
+pub struct Ball {
+    pub speed_x: f32,
+    pub speed_y: f32
+}
 
 #[derive(Component)]
 pub struct Wall {

@@ -20,6 +20,7 @@ const RPADDLE_DOWN_KEY: KeyCode = KeyCode::Down;
 // All paddle attributes
 const PADDLE_SIZES: Vec3 = Vec3 { x: 30.0, y: 75.0, z: 0.0 };
 const PADDLE_SPEED: f32 = 100.0;
+const PADDLE_SPEED_MULT: f32 = 2.0;
 
 // Player Plugin manages the player input and player paddles
 pub struct PlayerPlugin;
@@ -42,7 +43,7 @@ fn spawn(mut commands: Commands) {
         transform: Transform::from_translation(LPADDLE_START_POS).with_scale(PADDLE_SIZES),
         ..default()
     }, 
-    Paddle { id: LPADDLE_ID, speed: PADDLE_SPEED }));
+    Paddle { id: LPADDLE_ID, speed: PADDLE_SPEED * PADDLE_SPEED_MULT }));
 
     // Spawns Right Side Paddle
     commands.spawn((SpriteBundle {
@@ -53,7 +54,7 @@ fn spawn(mut commands: Commands) {
         transform: Transform::from_translation(RPADDLE_START_POS).with_scale(PADDLE_SIZES),
         ..default()
     },
-    Paddle { id: RPADDLE_ID, speed: PADDLE_SPEED }));
+    Paddle { id: RPADDLE_ID, speed: PADDLE_SPEED * PADDLE_SPEED_MULT }));
 
 }
 
